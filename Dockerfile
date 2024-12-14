@@ -14,8 +14,18 @@ RUN dpkg --add-architecture i386 \
 	# Insert SteamCMD agreement prompt answers
 	&& echo steam steam/question select "I AGREE" | debconf-set-selections \
 	&& echo steam steam/license note '' | debconf-set-selections \
-	&& apt-get install -y --no-install-recommends ca-certificates locales steamcmd \
+	&& apt-get install -y --no-install-recommends ca-certificates locales steamcmd wget
+
+ARG WINE_ENABLED=false
+# Install Wine and xvfb for fake display
+RUN if [[ -z "$WINE_ENABLED" ]]; then apt-get install -y --no-install-recommends wine wine32 wine64 \
+	cabextract libwine libwine:i386 fonts-wine xauth xvfb \
 	&& rm -rf /var/lib/apt/lists/*
+
+# Install winetricks for configuring wine
+RUN if [[ -z "$WINE_ENABLED" ]]; then wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks \
+	&& chmod +x winetricks \
+	&& mv -v winetricks /usr/local/bin
 
 # Add unicode support
 RUN locale-gen en_US.UTF-8
