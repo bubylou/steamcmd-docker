@@ -58,7 +58,7 @@ jobs:
             type=semver,pattern={{version}},value=${{ inputs.version }}
             type=ref,event=branch,suffix=-{{ sha }}
             type=ref,event=pr
-            type=raw,value=latest,enable=${{ is_default_branch && !matrix.wine }}
+            type=raw,value=latest,enable=${{ !matrix.wine }}
             type=raw,value=wine,enable=${{ matrix.wine }}
 
       # Build and push Docker image with Buildx (don't push on PR)
