@@ -20,6 +20,9 @@ jobs:
       # This is used to complete the identity challenge
       # with sigstore/fulcio when running outside of PRs.
       id-token: write
+    strategy:
+      matrix:
+        wine: [true, false]
 
     steps:
       - name: Checkout repository
@@ -55,7 +58,8 @@ jobs:
             type=semver,pattern={{version}},value=${{ inputs.version }}
             type=ref,event=branch,suffix=-{{ sha }}
             type=ref,event=pr
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=latest,enable=${{ !matrix.wine }}
+            type=raw,value=wine,enable=${{ matrix.wine }}
 
       # Build and push Docker image with Buildx (don't push on PR)
       - name: Build and push Docker image
@@ -68,9 +72,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          platforms: |
-            linux/386
-            linux/amd64
+          platforms: linux/amd64
+          build-args: WINE_ENABLED=${{ matrix.wine }}
 
       # Sign the resulting Docker image digest except on PRs.
       - name: Sign the published Docker image
