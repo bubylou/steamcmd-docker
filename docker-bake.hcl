@@ -2,21 +2,18 @@ group "default" {
   targets = ["main", "wine"]
 }
 
-variable "REGISTRY" {
-  default = "ghcr.io"
-}
-
 variable "REPO" {
   default = "bubylou/steamcmd"
 }
 
 variable "TAG" {
-  default = "v1.3.2"
+  default = "latest"
 }
 
-function "tag" {
-  params = [tag]
-  result = "${REGISTRY}/${REPO}:${tag}"
+function "tags" {
+  params = [suffix]
+  result = ["ghcr.io/${REPO}:latest${suffix}", "ghcr.io/${REPO}:${TAG}${suffix}",
+            "docker.io/${REPO}:latest${suffix}", "docker.io/${REPO}:${TAG}${suffix}"]
 }
 
 target "main" {
@@ -30,7 +27,7 @@ target "main" {
     "org.opencontainers.image.licenses" = "MIT"
   }
   platforms = ["linux/amd64"]
-  tags = [tag("latest"), tag("${TAG}")]
+  tags = tags("")
 }
 
 target "wine" {
@@ -38,5 +35,5 @@ target "wine" {
   args = {
     WINE_ENABLED = true
   }
-  tags = [tag("latest-wine"), tag("${TAG}-wine")]
+  tags = tags("-wine")
 }

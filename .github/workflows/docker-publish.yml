@@ -32,7 +32,7 @@ jobs:
         uses: docker/setup-buildx-action@v3.7.1
 
       # Login against a Github registry except on PR
-      - name: Log into registry github container registry
+      - name: Log into github container registry
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v3.3.0
         with:
@@ -40,12 +40,23 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # Login for Docker registry
+      - name: Log into docker container registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3.3.0
+        with:
+          registry: docker.io
+          username: ${{ vars.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
       # Build and push Docker image with Buildx (don't push on PR)
       - name: Build and push Docker image
         id: build-and-push
         uses: docker/bake-action@v5.11.0
         with:
           push: ${{ github.event_name != 'pull_request' }}
+        env:
+          TAG: ${{ github.ref_name }}
 
       # Sign the resulting Docker image digest except on PRs.
       - name: Sign the published Docker image

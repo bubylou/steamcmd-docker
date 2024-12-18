@@ -1,8 +1,5 @@
 FROM debian:stable-20241202-slim
 
-LABEL org.opencontainers.image.authors="Nicholas Malcolm"
-LABEL org.opencontainers.image.source="https://github.com/bubylou/steamcmd-docker"
-
 ENV USER=steam
 ENV PUID=1000
 
