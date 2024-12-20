@@ -14,13 +14,19 @@ RUN dpkg --add-architecture i386 \
 	&& apt-get install -y --no-install-recommends ca-certificates locales steamcmd wget
 
 ARG WINE_ENABLED=false
-# Install Wine and xvfb for fake display
-RUN if [ "$WINE_ENABLED" = "true" ]; then apt-get install -y --no-install-recommends wine wine32 wine64 \
-	cabextract libwine libwine:i386 fonts-wine xauth xvfb \
+# Install latest stable Wine and xvfb for fake display
+RUN if [ "$WINE_ENABLED" = "true" ]; then mkdir -pm755 /etc/apt/keyrings \
+	&& wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key \
+	&& wget -NP /etc/apt/sources.list.d/ \
+	https://dl.winehq.org/wine-builds/debian/dists/bookworm/winehq-bookworm.sources \
+	&& apt-get update -y \
+	&& apt-get install -y --no-install-recommends winehq-stable xvfb xauth cabextract \
+	winbind fonts-wine gdebi-core libgl1-mesa-glx:i386  \
 	&& rm -rf /var/lib/apt/lists/*; fi
 
 # Install winetricks for configuring wine
-RUN if [ "$WINE_ENABLED" = "true" ]; then wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks \
+RUN if [ "$WINE_ENABLED" = "true" ]; then winecfg /v win10 \
+	&& wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks \
 	&& chmod +x winetricks \
 	&& mv -v winetricks /usr/local/bin; fi
 
