@@ -11,7 +11,7 @@ RUN dpkg --add-architecture i386 \
 	# Insert SteamCMD agreement prompt answers
 	&& echo steam steam/question select "I AGREE" | debconf-set-selections \
 	&& echo steam steam/license note '' | debconf-set-selections \
-	&& apt-get install -y --no-install-recommends ca-certificates locales steamcmd wget
+	&& apt-get install -y --no-install-recommends ca-certificates locales steamcmd wget procps
 
 ARG WINE_ENABLED=false
 # Install Wine and xvfb for fake display
