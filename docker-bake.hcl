@@ -1,5 +1,5 @@
 group "default" {
-  targets = ["main", "wine"]
+  targets = ["image-release",  "image-wine"]
 }
 
 variable "REPO" {
@@ -16,7 +16,7 @@ function "tags" {
             "docker.io/${REPO}:latest${suffix}", "docker.io/${REPO}:${TAG}${suffix}"]
 }
 
-target "main" {
+target "image-release" {
   context = "."
   dockerfile = "Dockerfile"
   cache-from = ["type=gha"]
@@ -30,10 +30,17 @@ target "main" {
   tags = tags("")
 }
 
-target "wine" {
-  inherits = ["main"]
+target "image-wine" {
+  inherits = ["image-release"]
   args = {
-    WINE_ENABLED = true
+    RELEASE = "wine"
   }
   tags = tags("-wine")
+}
+
+target "image-dev" {
+  inherits = ["image-wine"]
+  cache-from = ["type=registry,ref=ghcr.io/bubylou/moria"]
+  cache-to = ["type=inline"]
+  tags = tags("-dev")
 }

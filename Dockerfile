@@ -1,4 +1,4 @@
-FROM debian:stable-20241202-slim
+FROM debian:12.8-slim
 
 ENV USER=steam
 ENV PUID=1000
@@ -14,14 +14,14 @@ RUN dpkg --add-architecture i386 \
 	&& apt-get install -y --no-install-recommends ca-certificates locales steamcmd \
 	wget procps ncat
 
-ARG WINE_ENABLED=false
+ARG RELEASE="default"
 # Install Wine and xvfb for fake display
-RUN if [ "$WINE_ENABLED" = "true" ]; then apt-get install -y --no-install-recommends \
+RUN if [ "$RELEASE" = "wine" ]; then apt-get install -y --no-install-recommends \
 	wine wine32 wine64 libwine libwine:i386 cabextract fonts-wine winbind xauth xvfb \
 	&& rm -rf /var/lib/apt/lists/*; fi
 
 # Install winetricks for configuring wine
-RUN if [ "$WINE_ENABLED" = "true" ]; then wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks \
+RUN if [ "$RELEASE" = "wine" ]; then wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks \
 	&& chmod +x winetricks \
 	&& mv -v winetricks /usr/local/bin; fi
 
