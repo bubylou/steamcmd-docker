@@ -16,8 +16,8 @@ RUN dpkg --add-architecture i386 \
 
 ARG WINE_ENABLED=false
 # Install Wine and xvfb for fake display
-RUN if [ "$WINE_ENABLED" = "true" ]; then apt-get install -y --no-install-recommends wine wine32 wine64 \
-	cabextract libwine libwine:i386 fonts-wine xauth xvfb \
+RUN if [ "$WINE_ENABLED" = "true" ]; then apt-get install -y --no-install-recommends \
+	wine wine32 wine64 libwine libwine:i386 cabextract fonts-wine winbind xauth xvfb \
 	&& rm -rf /var/lib/apt/lists/*; fi
 
 # Install winetricks for configuring wine
