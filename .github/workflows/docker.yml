@@ -2,6 +2,7 @@ name: Docker
 
 on:
   push:
+    branches: [ "main" ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
   pull_request:
@@ -46,17 +47,16 @@ jobs:
         uses: docker/bake-action@v5.11.0
         with:
           push: ${{ github.event_name != 'pull_request' }}
+          targets: release
         env:
           TAG: ${{ github.ref_name }}
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@v0.29.0
+        uses: aquasecurity/trivy-action@0.29.0
         with:
-          image-ref: '${{ env.IMAGE_NAME }}:${{ github.ref_name }}'
+          image-ref: 'ghcr.io/${{ env.IMAGE_NAME }}:${{ github.ref_name }}'
           format: 'template'
-          template: '@/contrib/sarif.tpl'
           output: 'trivy-results.sarif'
-          severity: 'CRITICAL,HIGH'
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3

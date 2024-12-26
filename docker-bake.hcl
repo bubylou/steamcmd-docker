@@ -1,4 +1,8 @@
 group "default" {
+  targets = ["image-dev"]
+}
+
+group "release" {
   targets = ["image-release",  "image-wine"]
 }
 
@@ -45,7 +49,7 @@ target "image-wine" {
 
 target "image-dev" {
   inherits = ["image-wine"]
-  cache-from = ["type=registry,ref=ghcr.io/bubylou/moria"]
+  cache-from = ["type=registry,ref=ghcr.io/${REPO}"]
   cache-to = ["type=inline"]
   tags = tags("-dev")
 }
