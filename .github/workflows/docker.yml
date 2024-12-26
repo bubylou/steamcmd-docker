@@ -48,3 +48,17 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
         env:
           TAG: ${{ github.ref_name }}
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@v0.29.0
+        with:
+          image-ref: '${{ env.IMAGE_NAME }}:${{ github.ref_name }}'
+          format: 'template'
+          template: '@/contrib/sarif.tpl'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
