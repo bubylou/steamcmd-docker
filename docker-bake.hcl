@@ -26,6 +26,11 @@ target "image-release" {
     "org.opencontainers.image.authors" = "Nicholas Malcolm <bubylou@pm.me>"
     "org.opencontainers.image.licenses" = "MIT"
   }
+  attest = [
+    "type=provenance,mode=max",
+    "type=sbom"
+  ]
+
   platforms = ["linux/amd64"]
   tags = tags("")
 }
