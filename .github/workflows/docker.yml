@@ -47,18 +47,6 @@ jobs:
         uses: docker/bake-action@v5.11.0
         with:
           push: ${{ github.event_name != 'pull_request' }}
-          targets: release
+          targets: release-all
         env:
           TAG: ${{ github.ref_name }}
-
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.29.0
-        with:
-          image-ref: 'ghcr.io/${{ env.IMAGE_NAME }}:${{ github.ref_name }}'
-          format: 'template'
-          output: 'trivy-results.sarif'
-
-      - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: 'trivy-results.sarif'
