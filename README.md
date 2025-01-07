@@ -22,6 +22,7 @@ docker run -it bubylou/steamcmd:latest +login anonymous +app_update 4020 +quit
 ### Build image
 ```shell
 docker buildx bake
+```
 
 
 ## Wine Build

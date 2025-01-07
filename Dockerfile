@@ -1,7 +1,7 @@
 FROM debian:12.8-slim
-
-ENV USER=steam
-ENV PUID=1000
+LABEL org.opencontainers.image.source="https://github.com/bubylou/steamcmd-docker" \
+	org.opencontainers.image.authors="Nicholas Malcolm <bubylou@pm.me>" \
+	org.opencontainers.image.licenses="MIT"
 
 # Install SteamCMD from nonfree i386 repo
 ARG DEBIAN_FRONTEND=noninteractive
@@ -12,16 +12,16 @@ RUN dpkg --add-architecture i386 \
 	&& echo steam steam/question select "I AGREE" | debconf-set-selections \
 	&& echo steam steam/license note '' | debconf-set-selections \
 	&& apt-get install -y --no-install-recommends ca-certificates locales steamcmd \
-	wget procps ncat
+	wget procps ncat \
+	&& ln -s /usr/games/steamcmd /usr/bin/steamcmd
 
 ARG RELEASE="default"
 # Install Wine and xvfb for fake display
-RUN if [ "$RELEASE" = "wine" ]; then apt-get install -y --no-install-recommends \
+RUN if [ "${RELEASE}" = "wine" ]; then apt-get install -y --no-install-recommends \
 	wine wine32 wine64 libwine libwine:i386 cabextract fonts-wine winbind xauth xvfb \
-	&& rm -rf /var/lib/apt/lists/*; fi
-
-# Install winetricks for configuring wine
-RUN if [ "$RELEASE" = "wine" ]; then wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks \
+	&& rm -rf /var/lib/apt/lists/* \
+	# Install winetricks for configuring wine prefix and installing dependencies
+	&& wget https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks \
 	&& chmod +x winetricks \
 	&& mv -v winetricks /usr/local/bin; fi
 
@@ -30,13 +30,18 @@ RUN locale-gen en_US.UTF-8
 ENV LANG='en_US.UTF-8' \
 	LANGUAGE='en_US:en'
 
-# Create inital user and directories
-RUN ln -s /usr/games/steamcmd /usr/bin/steamcmd \
-	&& mkdir /app /config /data \
-	&& useradd -u $PUID -m $USER \
-	&& chown  $USER:$USER -R /app /config /data
+# Default non-root user and group
+ENV USER=steam \
+	GROUP=users \
+	PUID=1000 \
+	PGID=1000
 
-USER steam
+# Create inital user, group, and directories
+RUN mkdir /app /config /data \
+	&& groupmod -g ${PGID} ${GROUP} \
+	&& useradd -u ${PUID} -m ${USER} \
+	&& chown  ${USER}:${GROUP} -R /app /config /data
+USER ${USER}
 
 # Update SteamCMD
 RUN steamcmd +quit \
