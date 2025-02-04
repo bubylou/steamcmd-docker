@@ -1,4 +1,4 @@
-FROM debian:12.8-slim
+FROM debian:12.9-slim
 LABEL org.opencontainers.image.source="https://github.com/bubylou/steamcmd-docker" \
 	org.opencontainers.image.authors="Nicholas Malcolm <bubylou@pm.me>" \
 	org.opencontainers.image.licenses="MIT"
@@ -26,9 +26,9 @@ RUN if [ "${RELEASE}" = "wine" ]; then apt-get install -y --no-install-recommend
 	&& mv -v winetricks /usr/local/bin; fi
 
 # Add unicode support
-RUN locale-gen en_US.UTF-8
 ENV LANG='en_US.UTF-8' \
 	LANGUAGE='en_US:en'
+RUN locale-gen en_US.UTF-8
 
 # Default non-root user and group
 ENV USER=steam \
