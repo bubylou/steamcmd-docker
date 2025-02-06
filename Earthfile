@@ -40,8 +40,8 @@ build:
     ENTRYPOINT ["steamcmd"]
     CMD ["+help", "+quit"]
 
-    SAVE IMAGE docker.io/bubylou/steamcmd:$tag docker.io/bubylou/steamcmd:latest
-    SAVE IMAGE ghcr.io/bubylou/steamcmd:$tag ghcr.io/bubylou/steamcmd:latest
+    SAVE IMAGE --push docker.io/bubylou/steamcmd:$tag docker.io/bubylou/steamcmd:latest
+    SAVE IMAGE --push ghcr.io/bubylou/steamcmd:$tag ghcr.io/bubylou/steamcmd:latest
 
 wine:
     FROM +build
@@ -56,8 +56,8 @@ wine:
         && mv -v winetricks /usr/local/bin
     USER $USER
 
-    SAVE IMAGE docker.io/bubylou/steamcmd:$tag-wine docker.io/bubylou/steamcmd:latest-wine
-    SAVE IMAGE ghcr.io/bubylou/steamcmd:$tag-wine ghcr.io/bubylou/steamcmd:latest-wine
+    SAVE IMAGE --push docker.io/bubylou/steamcmd:$tag-wine docker.io/bubylou/steamcmd:latest-wine
+    SAVE IMAGE --push ghcr.io/bubylou/steamcmd:$tag-wine ghcr.io/bubylou/steamcmd:latest-wine
 
 all:
     BUILD +build
