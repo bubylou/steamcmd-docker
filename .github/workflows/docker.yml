@@ -45,9 +45,8 @@ jobs:
 
       # Build and push container image with Earthly (don't push on PR)
       - name: Build and push
-        if: github.event_name != 'pull_request'
-        run: earthly --ci --push +all --tag ${{ github.ref_name }}
-
-      - name: Build only, no push
-        if: github.event_name == 'pull_request'
-        run: earthly --ci +all --tag ${{ github.ref_name }}
+        env:
+          PLATFORMS: "--platform=linux/amd64"
+          PUSH: ${{ github.event_name != 'pull_request' && '--push' || '' }}
+          TAG: ${{ github.ref_name }}
+        run: earthly --ci $PLATFORMS $PUSH +all --tag $TAG
